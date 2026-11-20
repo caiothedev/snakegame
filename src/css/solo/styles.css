@@ -186,3 +186,16 @@ canvas {
         display: flex;
     }
 }
+
+.gamepad-status {
+    color: #999;
+    font-size: 12px;
+    text-align: center;
+    max-width: min(90vw, 600px);
+}
+
+@media (max-width: 700px) {
+    .gamepad-status {
+        font-size: 11px;
+    }
+}

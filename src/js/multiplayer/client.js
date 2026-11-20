@@ -1,3 +1,6 @@
+import { createGamepadController } from "../gamepad/controller.js"
+import { createLeaderboard } from "./game.js"
+
 const canvas = document.querySelector("canvas")
 const ctx = canvas.getContext("2d")
 const scoreValue = document.querySelector(".score-value")
@@ -266,10 +269,12 @@ function escapeHtml(value) {
 function updatePlayersList() {
     if (!playersList) return
     
-    const sortedPlayers = Object.entries(players)
-        .sort(([, a], [, b]) => b.score - a.score)
-    
-    playersList.innerHTML = sortedPlayers.map(([id, player], index) => {
+    const sortedPlayers = createLeaderboard(
+        Object.entries(players).map(([id, player]) => ({ ...player, id }))
+    )
+
+    playersList.innerHTML = sortedPlayers.map(player => {
+        const { id } = player
         const isCurrentPlayer = id === playerId
         const className = isCurrentPlayer ? "current-player" : ""
 
@@ -291,3 +296,19 @@ function updateScore() {
     if (!playerId || !players[playerId]) return
     scoreValue.textContent = players[playerId].score.toString().padStart(2, "0")
 }
+
+const gamepadStatus = document.getElementById("gamepad-status")
+
+createGamepadController({
+    onDirection: sendDirection,
+    onPrimary: () => {
+        if (!playerId) {
+            if (nameInput.value.trim()) joinButton.click()
+            return
+        }
+        if (!isAlive) buttonPlay.click()
+    },
+    onStatus: message => {
+        if (gamepadStatus) gamepadStatus.textContent = message
+    }
+})

@@ -3,6 +3,7 @@ import {
     createGameState,
     resetGameState
 } from "./game.js"
+import { createGamepadController } from "../gamepad/controller.js"
 
 const canvas = document.querySelector("canvas")
 const ctx = canvas.getContext("2d")
@@ -316,4 +317,21 @@ Object.entries(dpadMap).forEach(([id, handler]) => {
         event.preventDefault()
     }, { passive: false })
     button.addEventListener("click", handler)
+})
+
+const gamepadStatus = document.getElementById("gamepad-status")
+
+createGamepadController({
+    onDirection: value => {
+        if (gameOverState || gameWinState || pauseState) return
+        const opposite = { up: "down", down: "up", left: "right", right: "left" }
+        if (value !== opposite[direction]) nextDirection = value
+    },
+    onPrimary: () => {
+        if (gameOverState || gameWinState) resetGame()
+    },
+    onPause: togglePause,
+    onStatus: message => {
+        if (gamepadStatus) gamepadStatus.textContent = message
+    }
 })

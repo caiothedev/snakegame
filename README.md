@@ -12,6 +12,12 @@ https://snakegame-one-opal.vercel.app
 
 ![Multiplayer Mode](assets/screenshots/3.png)
 
+## Gamepad support
+
+Play Solo or Multiplayer with compatible Xbox, PlayStation, and other standard-mapped controllers using the browser's native Gamepad API. Both modes support the D-pad and left analog stick. In Solo, A/Cross restarts after a win or loss and Start/Options pauses or resumes. In Multiplayer, A/Cross joins from the name dialog or respawns after elimination.
+
+See [GAMEPAD.md](docs/GAMEPAD.md) for setup, button mapping, browser requirements, and troubleshooting.
+
 ## Objectives
 
 This project was born out of a desire to learn and grow. The main objectives behind this project are:

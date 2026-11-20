@@ -12,6 +12,12 @@ https://snakegame-one-opal.vercel.app
 
 ![Modo Multiplayer](assets/screenshots/3.png)
 
+## Suporte a controles (gamepad)
+
+Jogue nos modos Solo e Multiplayer com controles Xbox, PlayStation e outros dispositivos com mapeamento padrão, usando a Gamepad API nativa do navegador. Ambos os modos aceitam D-pad e analógico esquerdo. No Solo, A/✕ reinicia após vitória ou derrota e Start/Options pausa ou continua. No Multiplayer, A/✕ entra pela janela de nome ou retorna ao jogo após ser eliminado.
+
+Consulte [CONTROLES.md](docs/CONTROLES.md) para configuração, mapeamento dos botões, requisitos do navegador e solução de problemas.
+
 ## Objetivos
 
 Este projeto nasceu de uma vontade de aprender e evoluir. Os principais objetivos por trás dele são:

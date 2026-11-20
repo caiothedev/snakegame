@@ -14,7 +14,7 @@
         </div>
         <div class="pause-overlay">
             <h2>PAUSADO</h2>
-            <p>Pressione Esc para continuar</p>
+            <p>Pressione Esc ou Start para continuar</p>
         </div>
         <div class="game">
             <div class="snake-color">
@@ -25,6 +25,7 @@
             </div>
             <canvas width="600" height="600" data-testid="game-canvas"></canvas>
         </div>
+        <p id="gamepad-status" class="gamepad-status" role="status" aria-live="polite">Conecte um controle para jogar</p>
         <div class="dpad">
             <button id="btn-up" class="dpad-btn dpad-up">▲</button>
             <div class="dpad-middle">
@@ -39,6 +40,6 @@
                 <path d="m15 18-6-6 6-6"/>
             </svg>
         </a>
-        <script src="../js/solo/script.js"></script>
+        <script type="module" src="../js/solo/script.js"></script>
     </body>
 </html>

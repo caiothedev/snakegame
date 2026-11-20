@@ -1,5 +1,6 @@
 import { WebSocketServer } from "ws"
 import { randomUUID } from "crypto"
+import { createPlayer, updatePlayerScore } from "./game.js"
 
 const wss = new WebSocketServer({ port: 8080, maxPayload: 1024 })
 
@@ -94,7 +95,8 @@ function checkCollision(player) {
 function checkFood(player) {
     const head = player.snake[player.snake.length - 1]
     if (head.x === food.x && head.y === food.y) {
-        player.score += 10
+        players[player.id] = updatePlayerScore(player, 10)
+        player = players[player.id]
         player.snake.push({ ...head })
         
         // Gera nova comida em posição válida
@@ -218,17 +220,13 @@ wss.on("connection", ws => {
 
             const safeName = String(data.name || "Jogador").trim().slice(0, 15) || "Jogador"
             
-            players[playerId] = {
-                id: playerId,
-                name: safeName,
-                color: chosenColor,
-                direction: "right",
-                nextDirection: "right",
-                snake: [startPos],
-                score: 0,
-                alive: true,
+            players[playerId] = createPlayer(
+                playerId,
+                safeName,
+                chosenColor,
+                startPos,
                 ws
-            }
+            )
             
             ws.send(JSON.stringify({ 
                 type: "joined", 
