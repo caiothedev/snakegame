@@ -1,52 +1,96 @@
-
-import { describe, it, expect } from "vitest"
+import { describe, expect, it, vi } from "vitest"
 import {
-    createGame,
-    moveSnake,
-    checkCollision,
-    eatFood
-} from "../../src/js/solo/game.js"
+    createFoodPosition,
+    createGameState,
+    resetGameState
+} from "../../js/solo/game.js"
 
-describe("Solo Game", () => {
-    describe("createGame", () => {
-        it("should create the initial game state", () => {
-            const game = createGame()
+describe("Solo game", () => {
+    describe("createFoodPosition", () => {
+        it("returns a free position on the board", () => {
+            const snake = [{ x: 0, y: 0 }]
+            const position = createFoodPosition(
+                snake,
+                60,
+                60,
+                30,
+                () => 0
+            )
 
-            expect(game.score).toBe(0)
-            expect(game.snake.length).toBeGreaterThan(0)
-            expect(game.gameOver).toBe(false)
+            expect(position).toEqual({ x: 30, y: 0 })
+        })
+
+        it("never places food on the snake", () => {
+            const snake = [
+                { x: 0, y: 0 },
+                { x: 30, y: 0 }
+            ]
+            const position = createFoodPosition(
+                snake,
+                60,
+                60,
+                30,
+                () => 0.5
+            )
+
+            expect(snake).not.toContainEqual(position)
+        })
+
+        it("returns null when the board has no free positions", () => {
+            const snake = [
+                { x: 0, y: 0 },
+                { x: 30, y: 0 },
+                { x: 0, y: 30 },
+                { x: 30, y: 30 }
+            ]
+            const random = vi.fn()
+
+            const position = createFoodPosition(
+                snake,
+                60,
+                60,
+                30,
+                random
+            )
+
+            expect(position).toBeNull()
+            expect(random).not.toHaveBeenCalled()
         })
     })
 
-    describe("moveSnake", () => {
-        it("should move the snake to the right", () => {
-            const game = createGame()
-            const initialPosition = { ...game.snake[0] }
+    describe("createGameState", () => {
+        it("creates a complete initial game state", () => {
+            const state = createGameState({ random: () => 0 })
 
-            const updatedGame = moveSnake(game)
-
-            expect(updatedGame.snake[0].x).toBe(initialPosition.x + 1)
-            expect(updatedGame.snake[0].y).toBe(initialPosition.y)
-        })
-    })
-
-    describe("checkCollision", () => {
-        it("should detect wall collisions", () => {
-            const game = createGame({
-                snake: [{ x: -1, y: 5 }]
+            expect(state).toMatchObject({
+                snake: [{ x: 270, y: 300 }],
+                food: expect.any(Object),
+                score: 0,
+                speed: 100,
+                gameOver: false,
+                gameWon: false,
+                paused: false
             })
-
-            expect(checkCollision(game)).toBe(true)
+            expect(state.direction).toBeUndefined()
+            expect(state.nextDirection).toBeUndefined()
         })
     })
 
-    describe("eatFood", () => {
-        it("should increase the score when eating food", () => {
-            const game = createGame()
+    describe("resetGameState", () => {
+        it("restores every gameplay value to its initial state", () => {
+            const resetState = resetGameState({ random: () => 0 })
 
-            const updatedGame = eatFood(game)
-
-            expect(updatedGame.score).toBeGreaterThan(game.score)
+            expect(resetState).toMatchObject({
+                snake: [{ x: 270, y: 300 }],
+                food: expect.any(Object),
+                score: 0,
+                speed: 100,
+                gameOver: false,
+                gameWon: false,
+                paused: false
+            })
+            expect(resetState.direction).toBeUndefined()
+            expect(resetState.nextDirection).toBeUndefined()
         })
     })
 })
