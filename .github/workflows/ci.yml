@@ -1,0 +1,104 @@
+
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Validate application
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate JavaScript syntax
+        run: |
+          git ls-files -z '*.js' | xargs -0 -r -n1 node --check
+
+      - name: Test HTTP server
+        run: |
+          npm start &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
+
+          for attempt in {1..20}; do
+            if curl --fail --silent http://localhost:3000/ > /dev/null; then
+              echo "HTTP server is running successfully"
+              exit 0
+            fi
+
+            sleep 1
+          done
+
+          echo "HTTP server failed to start"
+          exit 1
+
+      - name: Test WebSocket server
+        run: |
+          node src/js/multiplayer/server.js &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
+
+          node --input-type=module <<'EOF'
+          const socket = new WebSocket("ws://localhost:8080")
+
+          const timeout = setTimeout(() => {
+            socket.close()
+            console.error("WebSocket connection timed out")
+            process.exit(1)
+          }, 10000)
+
+          socket.addEventListener("open", () => {
+            socket.send(JSON.stringify({
+              type: "join",
+              name: "CI Test"
+            }))
+          })
+
+          socket.addEventListener("message", event => {
+            const data = JSON.parse(event.data)
+
+            if (data.type === "joined") {
+              clearTimeout(timeout)
+              console.log("WebSocket server is working")
+              socket.close()
+              process.exit(0)
+            }
+
+            if (data.type === "error") {
+              clearTimeout(timeout)
+              console.error(data.message)
+              process.exit(1)
+            }
+          })
+
+          socket.addEventListener("error", () => {
+            clearTimeout(timeout)
+            console.error("WebSocket connection failed")
+            process.exit(1)
+          })
+          EOF

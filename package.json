@@ -4,10 +4,17 @@
   "description": "Jogo da cobrinha clássico em HTML, CSS e JavaScript, com modo solo e multiplayer via WebSocket.",
   "type": "module",
   "scripts": {
-    "start": "node server.js",
-    "server": "node js/multiplayer/server.js"
+    "start": "node src/server.js",
+    "server": "node src/js/multiplayer/server.js",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "ws": "^8.18.3"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^4.0.0",
+    "vitest": "^4.0.0"
   }
 }
